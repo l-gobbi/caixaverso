@@ -7,32 +7,25 @@ import org.acme.dao.ProdutoDao;
 import org.acme.dto.Parcela;
 import org.acme.dto.ResultadoSimulacao;
 import org.acme.dto.SimulacaoRequest;
-import org.acme.model.Produto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @ApplicationScoped
-public class CalculaSimulacao {
+public class CalculaSimulacaoFacade {
 
     @Inject
     ProdutoDao produtoDao;
 
-    public List<ResultadoSimulacao> calcular(SimulacaoRequest request) {
-        Optional<Produto> produtoOpt = produtoDao.buscaProdutoPeloValorEPrazo(request.getValorDesejado(), request.getPrazo());
+    public List<ResultadoSimulacao> calcular(SimulacaoRequest request, BigDecimal taxaJuros) {
 
-        if (produtoOpt.isEmpty()) {
-            log.info("Nenhum produto encontrado para as condições desejadas: Valor = {}, Prazo = {}", request.getValorDesejado(), request.getPrazo());
-        }
-        Produto produto = produtoOpt.get();
         List<ResultadoSimulacao> resultados = new ArrayList<>();
 
-        resultados.add(calcularSac(request, produto.getPcTaxaJuros()));
-        resultados.add(calcularPrice(request, produto.getPcTaxaJuros()));
+        resultados.add(calcularSac(request, taxaJuros));
+        resultados.add(calcularPrice(request, taxaJuros));
         return resultados;
     }
 

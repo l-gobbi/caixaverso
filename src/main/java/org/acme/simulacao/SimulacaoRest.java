@@ -8,7 +8,9 @@ import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.acme.dto.SimulacaoRequest;
 import org.acme.dto.SimulacaoResponse;
-import org.acme.facade.CalculaSimulacao;
+import org.acme.facade.BuscaProdutoFacade;
+import org.acme.facade.CalculaSimulacaoFacade;
+import org.acme.model.Produto;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -24,14 +26,23 @@ public class SimulacaoRest {
     DataSource dataSource;
 
     @Inject
-    CalculaSimulacao calculaSimulacao;
+    CalculaSimulacaoFacade calculaSimulacaoFacade;
+
+    @Inject
+    BuscaProdutoFacade buscaProdutoFacade;
 
     @POST
     @Path("/buscarSimulacao")
     public Response buscarSimulaco(SimulacaoRequest request) {
         log.info("Request: {}", request);
+        Produto produto = buscaProdutoFacade.buscarProduto(request);
+
         try {
-            SimulacaoResponse response = new SimulacaoResponse(calculaSimulacao.calcular(request));
+            SimulacaoResponse response = new SimulacaoResponse();
+            response.setCodigoProduto(produto.getCoProduto());
+            response.setDescricaoProduto(produto.getNoProduto());
+            response.setTaxaJuros(produto.getPcTaxaJuros());
+            response.setResultadoSimulacao(calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros()));
             log.info("Response: {}", response);
             return Response.ok(response).build();
         } catch (NotFoundException e) {
