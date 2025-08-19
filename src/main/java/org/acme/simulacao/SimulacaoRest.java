@@ -6,14 +6,17 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.acme.dto.ResultadoSimulacao;
 import org.acme.dto.SimulacaoRequest;
 import org.acme.dto.SimulacaoResponse;
 import org.acme.facade.BuscaProdutoFacade;
 import org.acme.facade.CalculaSimulacaoFacade;
+import org.acme.facade.SalvarSimulacaoFacade;
 import org.acme.model.Produto;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.util.List;
 
 @Slf4j
 @Path("/")
@@ -31,11 +34,16 @@ public class SimulacaoRest {
     @Inject
     BuscaProdutoFacade buscaProdutoFacade;
 
+    @Inject
+    SalvarSimulacaoFacade salvarSimulacaoFacade;
+
     @POST
-    @Path("/buscarSimulacao")
-    public Response buscarSimulaco(SimulacaoRequest request) {
+    @Path("/fazerSimulacao")
+    public Response fazerSimulacao(SimulacaoRequest request) {
         log.info("Request: {}", request);
         Produto produto = buscaProdutoFacade.buscarProduto(request);
+        List<ResultadoSimulacao> resultados = calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros());
+        salvarSimulacaoFacade.executar(request, produto, resultados);
 
         try {
             SimulacaoResponse response = new SimulacaoResponse();
