@@ -1,0 +1,36 @@
+services:
+  # Serviço do Banco de Dados PostgreSQL
+  db:
+    image: postgres:17
+    container_name: simulacao-db
+    restart: always
+    environment:
+      POSTGRES_DB: simulacoes_db
+      POSTGRES_USER: seu_usuario
+      POSTGRES_PASSWORD: sua_senha
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Serviço da sua Aplicação Quarkus
+  app:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    container_name: simulacao-app
+    restart: on-failure
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      # Aponta a aplicação para o container do banco de dados
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://db:5432/simulacoes_db
+      QUARKUS_DATASOURCE_USERNAME: seu_usuario
+      QUARKUS_DATASOURCE_PASSWORD: sua_senha
+      # Garante que o Hibernate crie o schema no banco
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
+
+volumes:
+  postgres_data:
