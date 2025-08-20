@@ -1,5 +1,6 @@
 package org.acme.model.simulacao;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,7 +24,8 @@ public class Simulacao {
 
     private BigDecimal valorDesejado;
     private int prazo;
+    @Column(precision = 10, scale = 9)
     private BigDecimal taxaJuros;
-    private BigDecimal valorTotal; // Armazenará o valor total das parcelas
+    private BigDecimal valorTotal;
     private LocalDateTime dataSimulacao;
 }
