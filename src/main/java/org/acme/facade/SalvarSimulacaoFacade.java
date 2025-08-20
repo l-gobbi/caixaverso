@@ -22,7 +22,7 @@ public class SalvarSimulacaoFacade {
     SimulacaoDao simulacaoDao;
 
     @Transactional
-    public void executar(SimulacaoRequest request, Produto produto, List<ResultadoSimulacao> resultados) {
+    public Simulacao executar(SimulacaoRequest request, Produto produto, List<ResultadoSimulacao> resultados) {
         Simulacao simulacao = new Simulacao();
         simulacao.setValorDesejado(request.getValorDesejado());
         simulacao.setPrazo(request.getPrazo());
@@ -42,5 +42,7 @@ public class SalvarSimulacaoFacade {
         }
 
         simulacaoDao.persist(simulacao);
+
+        return simulacao;
     }
 }

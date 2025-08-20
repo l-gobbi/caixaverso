@@ -13,6 +13,7 @@ import org.acme.facade.BuscaProdutoFacade;
 import org.acme.facade.CalculaSimulacaoFacade;
 import org.acme.facade.SalvarSimulacaoFacade;
 import org.acme.model.produto.Produto;
+import org.acme.model.simulacao.Simulacao;
 
 
 import javax.sql.DataSource;
@@ -45,10 +46,11 @@ public class SimulacaoRest {
         log.info("Request: {}", request);
         Produto produto = buscaProdutoFacade.buscarProduto(request);
         List<ResultadoSimulacao> resultados = calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros());
-        salvarSimulacaoFacade.executar(request, produto, resultados);
+        Simulacao simulacaoSalva = salvarSimulacaoFacade.executar(request, produto, resultados);
 
         try {
             SimulacaoResponse response = new SimulacaoResponse();
+            response.setIdSimulacao(simulacaoSalva.getId());
             response.setCodigoProduto(produto.getCoProduto());
             response.setDescricaoProduto(produto.getNoProduto());
             response.setTaxaJuros(produto.getPcTaxaJuros());

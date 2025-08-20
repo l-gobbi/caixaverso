@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SimulacaoResponse {
 
+    private Long idSimulacao;
     private Integer codigoProduto;
     private String descricaoProduto;
     private BigDecimal taxaJuros;
