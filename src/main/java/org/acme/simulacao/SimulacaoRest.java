@@ -16,6 +16,7 @@ import org.acme.facade.BuscaProdutoFacade;
 import org.acme.facade.CalculaSimulacaoFacade;
 import org.acme.facade.ListaSimulacaoFacade;
 import org.acme.facade.SalvarSimulacaoFacade;
+import org.acme.menssageria.facade.EnviarMensagemEventHubFacade;
 import org.acme.model.produto.Produto;
 import org.acme.model.simulacao.Simulacao;
 
@@ -50,6 +51,9 @@ public class SimulacaoRest {
     @Inject
     ListaSimulacaoFacade listaSimulacaoFacade;
 
+    @Inject
+    EnviarMensagemEventHubFacade enviarMensagemEventHubFacade;
+
     @POST
     @Path("/fazerSimulacao")
     @Timed(value = "endpoint.fazerSimulacao.tempo", description = "Mede o tempo de resposta do endpoint de simulação.")
@@ -70,6 +74,7 @@ public class SimulacaoRest {
             simulacaoResponse.setResultadoSimulacao(calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros()));
             log.info("Response: {}", simulacaoResponse);
             response = Response.ok(simulacaoResponse).build();
+            enviarMensagemEventHubFacade.executar(response.toString());
         } catch (NotFoundException e) {
             log.error("Tentativa de simulação para produto inexistente: {}", e.getMessage());
             response = Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
