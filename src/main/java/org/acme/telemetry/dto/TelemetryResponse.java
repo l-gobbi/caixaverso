@@ -1,4 +1,4 @@
-package org.acme.dto;
+package org.acme.telemetry.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

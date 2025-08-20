@@ -1,12 +1,12 @@
-package org.acme.facade;
+package org.acme.telemetry.facade;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.acme.dto.EndpointStats;
-import org.acme.dto.TelemetryResponse;
+import org.acme.telemetry.dto.EndpointStats;
+import org.acme.telemetry.dto.TelemetryResponse;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
