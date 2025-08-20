@@ -1,5 +1,7 @@
 package org.acme.simulacao;
 
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -30,6 +32,9 @@ import java.util.List;
 public class SimulacaoRest {
 
     @Inject
+    MeterRegistry registry;
+
+    @Inject
     @io.quarkus.agroal.DataSource("consulta")
     DataSource dataSource;
 
@@ -47,70 +52,86 @@ public class SimulacaoRest {
 
     @POST
     @Path("/fazerSimulacao")
+    @Timed(value = "endpoint.fazerSimulacao.tempo", description = "Mede o tempo de resposta do endpoint de simulação.")
     public Response fazerSimulacao(SimulacaoRequest request) {
-        log.info("Request: {}", request);
-        Produto produto = buscaProdutoFacade.buscarProduto(request);
-        List<ResultadoSimulacao> resultados = calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros());
-        Simulacao simulacaoSalva = salvarSimulacaoFacade.executar(request, produto, resultados);
+        Response response;
 
         try {
-            SimulacaoResponse response = new SimulacaoResponse();
-            response.setIdSimulacao(simulacaoSalva.getId());
-            response.setCodigoProduto(produto.getCoProduto());
-            response.setDescricaoProduto(produto.getNoProduto());
-            response.setTaxaJuros(produto.getPcTaxaJuros());
-            response.setResultadoSimulacao(calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros()));
-            log.info("Response: {}", response);
-            return Response.ok(response).build();
+            log.info("Request: {}", request);
+            Produto produto = buscaProdutoFacade.buscarProduto(request);
+            List<ResultadoSimulacao> resultados = calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros());
+            Simulacao simulacaoSalva = salvarSimulacaoFacade.executar(request, produto, resultados);
+
+            SimulacaoResponse simulacaoResponse = new SimulacaoResponse();
+            simulacaoResponse.setIdSimulacao(simulacaoSalva.getId());
+            simulacaoResponse.setCodigoProduto(produto.getCoProduto());
+            simulacaoResponse.setDescricaoProduto(produto.getNoProduto());
+            simulacaoResponse.setTaxaJuros(produto.getPcTaxaJuros());
+            simulacaoResponse.setResultadoSimulacao(calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros()));
+            log.info("Response: {}", simulacaoResponse);
+            response = Response.ok(simulacaoResponse).build();
         } catch (NotFoundException e) {
-            log.error("Simulação não encontrada: {}", e.getMessage());
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(e.getMessage())
-                    .build();
+            log.error("Tentativa de simulação para produto inexistente: {}", e.getMessage());
+            response = Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
         catch (Exception e) {
-            log.error("Erro ao simular: {}", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro ao buscar resultado da simulação: " + e.getMessage())
-                    .build();
+            log.error("Erro inesperado ao fazer simulação: {}", e.getMessage(), e);
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Ocorreu um erro inesperado ao processar a simulação.").build();
+
         }
+        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
+        registry.counter("endpoint.fazerSimulacao.requisicoes", "outcome", outcome).increment();
+        return response;
     }
 
     @GET
     @Path("/listarSimulacoes")
+    @Timed(value = "endpoint.listarSimulacoes.tempo", description = "Mede o tempo de resposta do endpoint de listagem.")
     public Response listarSimulacoes(
             @QueryParam("pagina") @DefaultValue("1") int pagina,
             @QueryParam("qtdRegistrosPagina") @DefaultValue("10") int qtdRegistrosPagina) {
+        Response response;
         try {
-            PaginatedSimulacaoResponse response = listaSimulacaoFacade.executar(pagina, qtdRegistrosPagina);
-            return Response.ok(response).build();
+            PaginatedSimulacaoResponse paginatedResponse = listaSimulacaoFacade.executar(pagina, qtdRegistrosPagina);
+            response = Response.ok(paginatedResponse).build();
         } catch (Exception e) {
             log.error("Erro ao listar simulações: {}", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Erro ao listar simulações: " + e.getMessage())
                     .build();
         }
+        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
+        registry.counter("endpoint.listarSimulacoes.requisicoes", "outcome", outcome).increment();
+
+        return response;
     }
 
     @GET
     @Path("/health")
     @Produces(MediaType.TEXT_PLAIN)
+    @Timed(value = "endpoint.health.tempo", description = "Mede o tempo de resposta do health check.")
     public Response healthCheck() {
+        Response response;
         try (Connection connection = dataSource.getConnection()) {
             if (connection.isValid(5)) {
                 log.info("Conexão com o banco de dados bem-sucedida!");
-                return Response.ok("SUCESSO: Conexão com o banco de dados estabelecida!").build();
+                response = Response.ok("SUCESSO: Conexão com o banco de dados estabelecida!").build();
             } else {
                 log.error("A conexão com o banco de dados não é válida.");
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity("FALHA: A conexão com o banco de dados não é válida.")
                         .build();
             }
         } catch (Exception e) {
             log.error("Erro ao tentar conectar com o banco de dados: {}", e.getMessage());
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("FALHA: Não foi possível conectar ao banco de dados. Erro: " + e.getMessage())
                     .build();
         }
+        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
+        registry.counter("endpoint.health.requisicoes", "outcome", outcome).increment();
+
+        return response;
     }
 }
