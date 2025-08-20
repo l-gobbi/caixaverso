@@ -36,4 +36,13 @@ public class ProdutoDao {
                 .findFirst()
                 .map(result -> (Produto) result);
     }
+
+    public Optional<Produto> buscaProdutoPelaTaxa(BigDecimal taxa) {
+        String sql = "SELECT * FROM PRODUTO p WHERE p.PC_TAXA_JUROS = ?";
+        Query query = em.createNativeQuery(sql, Produto.class);
+        query.setParameter(1, taxa);
+        return query.getResultStream()
+                .findFirst()
+                .map(result -> (Produto) result);
+    }
 }

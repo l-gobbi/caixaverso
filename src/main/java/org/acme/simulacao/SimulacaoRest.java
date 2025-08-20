@@ -8,14 +8,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.acme.dto.PaginatedSimulacaoResponse;
-import org.acme.dto.ResultadoSimulacao;
-import org.acme.dto.SimulacaoRequest;
-import org.acme.dto.SimulacaoResponse;
-import org.acme.facade.BuscaProdutoFacade;
-import org.acme.facade.CalculaSimulacaoFacade;
-import org.acme.facade.ListaSimulacaoFacade;
-import org.acme.facade.SalvarSimulacaoFacade;
+import org.acme.dto.*;
+import org.acme.facade.*;
 import org.acme.menssageria.facade.EnviarMensagemEventHubFacade;
 import org.acme.model.produto.Produto;
 import org.acme.model.simulacao.Simulacao;
@@ -23,6 +17,8 @@ import org.acme.model.simulacao.Simulacao;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Slf4j
@@ -53,6 +49,9 @@ public class SimulacaoRest {
 
     @Inject
     EnviarMensagemEventHubFacade enviarMensagemEventHubFacade;
+
+    @Inject
+    RelatorioSimulacaoFacade relatorioSimulacaoFacade;
 
     @POST
     @Path("/fazerSimulacao")
@@ -109,6 +108,30 @@ public class SimulacaoRest {
         String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
         registry.counter("endpoint.listarSimulacoes.requisicoes", "outcome", outcome).increment();
 
+        return response;
+    }
+
+    @GET
+    @Path("/relatorio/simulacoes-diarias")
+    @Timed(value = "endpoint.relatorio.simulacoesdiarias.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.")
+    public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
+        Response response;
+        try {
+            LocalDate data = LocalDate.parse(dataStr);
+            SimulacaoDiariaResponse simulacaoDiariaResponse = relatorioSimulacaoFacade.executar(data);
+            response = Response.ok(simulacaoDiariaResponse).build();
+        } catch (DateTimeParseException e) {
+            response = Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Formato de data inválido. Use o formato AAAA-MM-DD.")
+                    .build();
+        } catch (Exception e) {
+            log.error("Erro ao buscar relatório de simulações diárias: {}", e.getMessage());
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar relatório de simulações diárias: " + e.getMessage())
+                    .build();
+        }
+        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
+        registry.counter("endpoint.relatorio.simulacoesdiarias.requisicoes", "outcome", outcome).increment();
         return response;
     }
 
