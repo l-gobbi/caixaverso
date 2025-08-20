@@ -12,7 +12,8 @@ import org.acme.dto.SimulacaoResponse;
 import org.acme.facade.BuscaProdutoFacade;
 import org.acme.facade.CalculaSimulacaoFacade;
 import org.acme.facade.SalvarSimulacaoFacade;
-import org.acme.model.Produto;
+import org.acme.model.produto.Produto;
+
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,6 +27,7 @@ import java.util.List;
 public class SimulacaoRest {
 
     @Inject
+    @io.quarkus.agroal.DataSource("consulta")
     DataSource dataSource;
 
     @Inject

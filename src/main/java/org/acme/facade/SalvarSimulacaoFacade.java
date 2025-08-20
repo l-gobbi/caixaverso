@@ -7,7 +7,7 @@ import org.acme.dao.SimulacaoDao;
 import org.acme.dto.Parcela;
 import org.acme.dto.ResultadoSimulacao;
 import org.acme.dto.SimulacaoRequest;
-import org.acme.model.Produto;
+import org.acme.model.produto.Produto;
 import org.acme.model.simulacao.Simulacao;
 
 import java.math.BigDecimal;
