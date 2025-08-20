@@ -6,11 +6,13 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.acme.dto.PaginatedSimulacaoResponse;
 import org.acme.dto.ResultadoSimulacao;
 import org.acme.dto.SimulacaoRequest;
 import org.acme.dto.SimulacaoResponse;
 import org.acme.facade.BuscaProdutoFacade;
 import org.acme.facade.CalculaSimulacaoFacade;
+import org.acme.facade.ListaSimulacaoFacade;
 import org.acme.facade.SalvarSimulacaoFacade;
 import org.acme.model.produto.Produto;
 import org.acme.model.simulacao.Simulacao;
@@ -40,6 +42,9 @@ public class SimulacaoRest {
     @Inject
     SalvarSimulacaoFacade salvarSimulacaoFacade;
 
+    @Inject
+    ListaSimulacaoFacade listaSimulacaoFacade;
+
     @POST
     @Path("/fazerSimulacao")
     public Response fazerSimulacao(SimulacaoRequest request) {
@@ -67,6 +72,22 @@ public class SimulacaoRest {
             log.error("Erro ao simular: {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Erro ao buscar resultado da simulação: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/listarSimulacoes")
+    public Response listarSimulacoes(
+            @QueryParam("pagina") @DefaultValue("1") int pagina,
+            @QueryParam("qtdRegistrosPagina") @DefaultValue("10") int qtdRegistrosPagina) {
+        try {
+            PaginatedSimulacaoResponse response = listaSimulacaoFacade.executar(pagina, qtdRegistrosPagina);
+            return Response.ok(response).build();
+        } catch (Exception e) {
+            log.error("Erro ao listar simulações: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao listar simulações: " + e.getMessage())
                     .build();
         }
     }
