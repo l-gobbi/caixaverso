@@ -3,6 +3,7 @@ package org.acme.telemetry.facade;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.distribution.ValueAtPercentile;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.acme.telemetry.dto.EndpointStats;
@@ -25,19 +26,17 @@ public class TelemetryFacade {
         statsList.add(createStatsForEndpoint("fazerSimulacao"));
         statsList.add(createStatsForEndpoint("listarSimulacoes"));
         statsList.add(createStatsForEndpoint("health"));
+        statsList.add(createStatsForEndpoint("relatorio.simulacoesdiarias"));
 
         return new TelemetryResponse(LocalDate.now().toString(), statsList);
     }
 
     private EndpointStats createStatsForEndpoint(String apiName) {
-        // Busca o Timer pela métrica que definimos na anotação @Timed
+
         Timer timer = registry.find("endpoint." + apiName + ".tempo").timer();
 
-        // ** LÓGICA CORRIGIDA **
-        // Busca o contador de SUCESSO pela nossa tag customizada
         Counter successRequests = registry.find("endpoint." + apiName + ".requisicoes").tag("outcome", "SUCCESS").counter();
 
-        // Busca o contador de ERRO pela nossa tag customizada
         Counter errorRequests = registry.find("endpoint." + apiName + ".requisicoes").tag("outcome", "ERROR").counter();
 
         long successCount = (successRequests != null) ? (long) successRequests.count() : 0;
@@ -53,6 +52,11 @@ public class TelemetryFacade {
         if (timer != null) {
             avg = timer.mean(TimeUnit.MILLISECONDS);
             max = timer.max(TimeUnit.MILLISECONDS);
+
+            ValueAtPercentile[] percentiles = timer.takeSnapshot().percentileValues();
+            if (percentiles.length > 0 && percentiles[0].percentile() == 0.0) {
+                min = percentiles[0].value(TimeUnit.MILLISECONDS);
+            }
         }
 
         return new EndpointStats(

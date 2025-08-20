@@ -55,7 +55,7 @@ public class SimulacaoRest {
 
     @POST
     @Path("/fazerSimulacao")
-    @Timed(value = "endpoint.fazerSimulacao.tempo", description = "Mede o tempo de resposta do endpoint de simulação.")
+    @Timed(value = "endpoint.fazerSimulacao.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
     public Response fazerSimulacao(SimulacaoRequest request) {
         Response response;
 
@@ -91,7 +91,7 @@ public class SimulacaoRest {
 
     @GET
     @Path("/listarSimulacoes")
-    @Timed(value = "endpoint.listarSimulacoes.tempo", description = "Mede o tempo de resposta do endpoint de listagem.")
+    @Timed(value = "endpoint.listarSimulacoes.tempo", description = "Mede o tempo de resposta do endpoint de listagem.", percentiles = 0.0)
     public Response listarSimulacoes(
             @QueryParam("pagina") @DefaultValue("1") int pagina,
             @QueryParam("qtdRegistrosPagina") @DefaultValue("10") int qtdRegistrosPagina) {
@@ -113,7 +113,7 @@ public class SimulacaoRest {
 
     @GET
     @Path("/relatorio/simulacoes-diarias")
-    @Timed(value = "endpoint.relatorio.simulacoesdiarias.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.")
+    @Timed(value = "endpoint.relatorio.simulacoesdiarias.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.", percentiles = 0.0)
     public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
         Response response;
         try {
@@ -138,7 +138,7 @@ public class SimulacaoRest {
     @GET
     @Path("/health")
     @Produces(MediaType.TEXT_PLAIN)
-    @Timed(value = "endpoint.health.tempo", description = "Mede o tempo de resposta do health check.")
+    @Timed(value = "endpoint.health.tempo", description = "Mede o tempo de resposta do health check.", percentiles = 0.0)
     public Response healthCheck() {
         Response response;
         try (Connection connection = dataSource.getConnection()) {
