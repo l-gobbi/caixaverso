@@ -1,16 +1,19 @@
-package org.acme.facade;
+package org.acme.simulacao.facade;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
-import org.acme.dao.ProdutoDao;
-import org.acme.dao.SimulacaoDao;
-import org.acme.dto.*;
+import org.acme.simulacao.dao.ProdutoDao;
+import org.acme.simulacao.dao.SimulacaoDao;
 import org.acme.mensageria.SimulacaoEventPublisher;
 import org.acme.model.produto.Produto;
 import org.acme.model.simulacao.Simulacao;
+import org.acme.simulacao.dto.Parcela;
+import org.acme.simulacao.dto.ResultadoSimulacao;
+import org.acme.simulacao.dto.SimulacaoRequest;
+import org.acme.simulacao.dto.SimulacaoResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -8,10 +8,12 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.acme.telemetry.dto.TelemetryResponse;
 import org.acme.telemetry.facade.TelemetryFacade;
 
-@Path("/telemetria")
+@Slf4j
+@Path("/api/v1/telemetria")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
@@ -26,8 +28,7 @@ public class TelemetryRest {
             TelemetryResponse telemetryData = telemetryFacade.getTelemetryData();
             return Response.ok(telemetryData).build();
         } catch (Exception e) {
-            // Adicionando um log de erro para ajudar na depuração
-            e.printStackTrace();
+            log.error("Erro ao buscar dados de telemetria", e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Erro ao buscar dados de telemetria: " + e.getMessage())
                     .build();

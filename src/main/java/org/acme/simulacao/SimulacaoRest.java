@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.simulacao;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -8,17 +8,21 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.acme.dto.*;
-import org.acme.facade.*;
+import org.acme.simulacao.dto.PaginatedSimulacaoResponse;
+import org.acme.simulacao.dto.SimulacaoDiariaResponse;
+import org.acme.simulacao.dto.SimulacaoRequest;
+import org.acme.simulacao.dto.SimulacaoResponse;
+import org.acme.simulacao.facade.FazerSimulacaoFacade;
+import org.acme.simulacao.facade.ListaSimulacaoFacade;
+import org.acme.simulacao.facade.RelatorioSimulacaoFacade;
 
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 @Slf4j
-@Path("/")
+@Path("/api/v1/simulacoes")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
@@ -41,9 +45,8 @@ public class SimulacaoRest {
     RelatorioSimulacaoFacade relatorioSimulacaoFacade;
 
     @POST
-    @Path("/fazerSimulacao")
-    @Timed(value = "endpoint.fazerSimulacao.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
-    public Response fazerSimulacao(SimulacaoRequest request) {
+    @Timed(value = "endpoint.simulacoes.post.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
+    public Response criarSimulacao(SimulacaoRequest request) {
         Response response;
 
         try {
@@ -64,13 +67,12 @@ public class SimulacaoRest {
 
         }
         String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.fazerSimulacao.requisicoes", "outcome", outcome).increment();
+        registry.counter("endpoint.simulacoes.post.requisicoes", "outcome", outcome).increment();
         return response;
     }
 
     @GET
-    @Path("/listarSimulacoes")
-    @Timed(value = "endpoint.listarSimulacoes.tempo", description = "Mede o tempo de resposta do endpoint de listagem.", percentiles = 0.0)
+    @Timed(value = "endpoint.simulacoes.get.tempo", description = "Mede o tempo de resposta do endpoint de listagem.", percentiles = 0.0)
     public Response listarSimulacoes(
             @QueryParam("pagina") @DefaultValue("1") int pagina,
             @QueryParam("qtdRegistrosPagina") @DefaultValue("10") int qtdRegistrosPagina) {
@@ -85,14 +87,14 @@ public class SimulacaoRest {
                     .build();
         }
         String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.listarSimulacoes.requisicoes", "outcome", outcome).increment();
+        registry.counter("endpoint.simulacoes.get.requisicoes", "outcome", outcome).increment();
 
         return response;
     }
 
     @GET
-    @Path("/relatorio/simulacoes-diarias")
-    @Timed(value = "endpoint.relatorio.simulacoesdiarias.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.", percentiles = 0.0)
+    @Path("/diarias")
+    @Timed(value = "endpoint.simulacoes.diarias.get.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.", percentiles = 0.0)
     public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
         Response response;
         try {
@@ -115,7 +117,7 @@ public class SimulacaoRest {
                     .build();
         }
         String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.relatorio.simulacoesdiarias.requisicoes", "outcome", outcome).increment();
+        registry.counter("endpoint.simulacoes.diarias.get.requisicoes", "outcome", outcome).increment();
         return response;
     }
 }

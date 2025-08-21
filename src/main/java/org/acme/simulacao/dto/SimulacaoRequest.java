@@ -1,4 +1,4 @@
-package org.acme.dto;
+package org.acme.simulacao.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

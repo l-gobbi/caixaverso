@@ -1,12 +1,12 @@
-package org.acme.facade;
+package org.acme.simulacao.facade;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.acme.dao.ProdutoDao;
-import org.acme.dao.SimulacaoDao;
-import org.acme.dto.SimulacaoAgregada;
-import org.acme.dto.SimulacaoDiariaResponse;
-import org.acme.dto.SimulacaoProdutoDiario;
+import org.acme.simulacao.dao.ProdutoDao;
+import org.acme.simulacao.dao.SimulacaoDao;
+import org.acme.simulacao.dto.SimulacaoAgregada;
+import org.acme.simulacao.dto.SimulacaoDiariaResponse;
+import org.acme.simulacao.dto.SimulacaoProdutoDiario;
 import org.acme.model.produto.Produto;
 
 import java.math.RoundingMode;

@@ -1,11 +1,11 @@
-package org.acme.dao;
+package org.acme.simulacao.dao;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import org.acme.dto.SimulacaoAgregada;
+import org.acme.simulacao.dto.SimulacaoAgregada;
 import org.acme.model.simulacao.Simulacao;
 
 import java.math.BigDecimal;

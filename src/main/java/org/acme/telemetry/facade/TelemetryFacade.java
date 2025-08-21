@@ -23,9 +23,9 @@ public class TelemetryFacade {
     public TelemetryResponse getTelemetryData() {
         List<EndpointStats> statsList = new ArrayList<>();
 
-        statsList.add(createStatsForEndpoint("fazerSimulacao"));
-        statsList.add(createStatsForEndpoint("listarSimulacoes"));
-        statsList.add(createStatsForEndpoint("relatorio.simulacoesdiarias"));
+        statsList.add(createStatsForEndpoint("simulacoes.post"));
+        statsList.add(createStatsForEndpoint("simulacoes.get"));
+        statsList.add(createStatsForEndpoint("simulacoes.diarias.get"));
 
         return new TelemetryResponse(LocalDate.now().toString(), statsList);
     }

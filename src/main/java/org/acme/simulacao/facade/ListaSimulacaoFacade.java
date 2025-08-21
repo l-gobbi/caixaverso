@@ -1,10 +1,10 @@
-package org.acme.facade;
+package org.acme.simulacao.facade;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.acme.dao.SimulacaoDao;
-import org.acme.dto.PaginatedSimulacaoResponse;
-import org.acme.dto.SimulacaoDetalheResponse;
+import org.acme.simulacao.dao.SimulacaoDao;
+import org.acme.simulacao.dto.PaginatedSimulacaoResponse;
+import org.acme.simulacao.dto.SimulacaoDetalheResponse;
 import org.acme.model.simulacao.Simulacao;
 
 import java.util.List;

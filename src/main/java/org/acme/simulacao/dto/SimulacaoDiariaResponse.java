@@ -1,4 +1,4 @@
-package org.acme.dto;
+package org.acme.simulacao.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResultadoSimulacao {
-    private String tipo;
-    private List<Parcela> parcelas;
+public class SimulacaoDiariaResponse {
+    private String dataReferencia;
+    private List<SimulacaoProdutoDiario> simulacoes;
 }

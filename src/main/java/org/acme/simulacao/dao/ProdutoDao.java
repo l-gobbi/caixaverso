@@ -1,4 +1,4 @@
-package org.acme.dao;
+package org.acme.simulacao.dao;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
