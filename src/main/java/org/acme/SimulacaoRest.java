@@ -118,32 +118,4 @@ public class SimulacaoRest {
         registry.counter("endpoint.relatorio.simulacoesdiarias.requisicoes", "outcome", outcome).increment();
         return response;
     }
-
-    @GET
-    @Path("/health")
-    @Produces(MediaType.TEXT_PLAIN)
-    @Timed(value = "endpoint.health.tempo", description = "Mede o tempo de resposta do health check.", percentiles = 0.0)
-    public Response healthCheck() {
-        Response response;
-        try (Connection connection = dataSource.getConnection()) {
-            if (connection.isValid(5)) {
-                log.info("Conexão com o banco de dados bem-sucedida!");
-                response = Response.ok("SUCESSO: Conexão com o banco de dados estabelecida!").build();
-            } else {
-                log.error("A conexão com o banco de dados não é válida.");
-                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("FALHA: A conexão com o banco de dados não é válida.")
-                        .build();
-            }
-        } catch (Exception e) {
-            log.error("Erro ao tentar conectar com o banco de dados: {}", e.getMessage());
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("FALHA: Não foi possível conectar ao banco de dados. Erro: " + e.getMessage())
-                    .build();
-        }
-        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.health.requisicoes", "outcome", outcome).increment();
-
-        return response;
-    }
 }

@@ -25,7 +25,6 @@ public class TelemetryFacade {
 
         statsList.add(createStatsForEndpoint("fazerSimulacao"));
         statsList.add(createStatsForEndpoint("listarSimulacoes"));
-        statsList.add(createStatsForEndpoint("health"));
         statsList.add(createStatsForEndpoint("relatorio.simulacoesdiarias"));
 
         return new TelemetryResponse(LocalDate.now().toString(), statsList);
