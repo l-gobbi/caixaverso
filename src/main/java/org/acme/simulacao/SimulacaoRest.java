@@ -4,6 +4,9 @@ import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -46,7 +49,7 @@ public class SimulacaoRest {
 
     @POST
     @Timed(value = "endpoint.simulacoes.post.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
-    public Response criarSimulacao(SimulacaoRequest request) {
+    public Response criarSimulacao(@Valid SimulacaoRequest request) {
         Response response;
 
         try {
@@ -74,8 +77,8 @@ public class SimulacaoRest {
     @GET
     @Timed(value = "endpoint.simulacoes.get.tempo", description = "Mede o tempo de resposta do endpoint de listagem.", percentiles = 0.0)
     public Response listarSimulacoes(
-            @QueryParam("pagina") @DefaultValue("1") int pagina,
-            @QueryParam("qtdRegistrosPagina") @DefaultValue("10") int qtdRegistrosPagina) {
+            @QueryParam("pagina") @DefaultValue("1") @Min(1) int pagina,
+            @QueryParam("qtdRegistrosPagina") @DefaultValue("10") @Min(1) @Max(100) int qtdRegistrosPagina) {
         Response response;
         try {
             PaginatedSimulacaoResponse paginatedResponse = listaSimulacaoFacade.executar(pagina, qtdRegistrosPagina);

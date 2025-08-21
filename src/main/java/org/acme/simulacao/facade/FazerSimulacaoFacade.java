@@ -44,7 +44,7 @@ public class FazerSimulacaoFacade {
     }
 
     @Transactional
-    protected Simulacao salvarEPublicar(SimulacaoRequest request, Produto produto, List<ResultadoSimulacao> resultados) {
+    public Simulacao salvarEPublicar(SimulacaoRequest request, Produto produto, List<ResultadoSimulacao> resultados) {
 
         Simulacao simulacaoSalva = salvarSimulacao(request, produto, resultados);
 
