@@ -9,7 +9,11 @@ import jakarta.persistence.Query;
 import org.acme.model.produto.Produto;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProdutoDao {
@@ -39,13 +43,18 @@ public class ProdutoDao {
                 .map(result -> (Produto) result);
     }
 
-    @CacheResult(cacheName = "produtos-por-taxa")
-    public Optional<Produto> buscaProdutoPelaTaxa(BigDecimal taxa) {
-        String sql = "SELECT * FROM PRODUTO p WHERE p.PC_TAXA_JUROS = ?";
+    public Map<BigDecimal, Produto> buscaProdutosPelasTaxas(List<BigDecimal> taxas) {
+        if (taxas == null || taxas.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        String sql = "SELECT * FROM PRODUTO p WHERE p.PC_TAXA_JUROS IN (:taxas)";
         Query query = em.createNativeQuery(sql, Produto.class);
-        query.setParameter(1, taxa);
-        return query.getResultStream()
-                .findFirst()
-                .map(result -> (Produto) result);
+        query.setParameter("taxas", taxas);
+
+        List<Produto> produtos = query.getResultList();
+
+        return produtos.stream()
+                .collect(Collectors.toMap(Produto::getPcTaxaJuros, produto -> produto));
     }
 }
