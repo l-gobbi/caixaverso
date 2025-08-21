@@ -8,7 +8,7 @@ import jakarta.ws.rs.NotFoundException;
 import org.acme.dao.ProdutoDao;
 import org.acme.dao.SimulacaoDao;
 import org.acme.dto.*;
-import org.acme.menssageria.SimulacaoEventPublisher;
+import org.acme.mensageria.SimulacaoEventPublisher;
 import org.acme.model.produto.Produto;
 import org.acme.model.simulacao.Simulacao;
 

@@ -1,4 +1,4 @@
-package org.acme.menssageria;
+package org.acme.mensageria;
 
 import com.azure.messaging.eventhubs.EventData;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
