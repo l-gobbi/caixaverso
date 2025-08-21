@@ -1,4 +1,4 @@
-package org.acme.simulacao;
+package org.acme;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
