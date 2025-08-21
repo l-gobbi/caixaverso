@@ -83,6 +83,10 @@
             <artifactId>azure-messaging-eventhubs</artifactId>
             <version>5.14.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-cache</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

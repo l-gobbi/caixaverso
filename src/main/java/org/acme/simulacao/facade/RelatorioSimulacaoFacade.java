@@ -1,5 +1,6 @@
 package org.acme.simulacao.facade;
 
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.acme.simulacao.dao.ProdutoDao;
@@ -23,6 +24,7 @@ public class RelatorioSimulacaoFacade {
     @Inject
     ProdutoDao produtoDao;
 
+    @CacheResult(cacheName = "relatorios-diarios")
     public SimulacaoDiariaResponse executar(LocalDate data) {
         // 1. Busca os dados agregados do banco de simulações
         List<SimulacaoAgregada> agregados = simulacaoDao.getSimulacoesAgregadasPorDia(data);

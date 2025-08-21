@@ -1,5 +1,6 @@
 package org.acme.simulacao.dao;
 
+import io.quarkus.cache.CacheResult;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -17,6 +18,7 @@ public class ProdutoDao {
     @PersistenceUnit(unitName = "consulta")
     EntityManager em;
 
+    @CacheResult(cacheName = "produtos-por-valor-prazo")
     public Optional<Produto> buscaProdutoPeloValorEPrazo(BigDecimal valor, int prazo) {
 
         String sql = "SELECT * FROM PRODUTO p " +
@@ -37,6 +39,7 @@ public class ProdutoDao {
                 .map(result -> (Produto) result);
     }
 
+    @CacheResult(cacheName = "produtos-por-taxa")
     public Optional<Produto> buscaProdutoPelaTaxa(BigDecimal taxa) {
         String sql = "SELECT * FROM PRODUTO p WHERE p.PC_TAXA_JUROS = ?";
         Query query = em.createNativeQuery(sql, Produto.class);
