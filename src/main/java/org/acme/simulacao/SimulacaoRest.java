@@ -18,7 +18,11 @@ import org.acme.simulacao.dto.SimulacaoResponse;
 import org.acme.simulacao.facade.FazerSimulacaoFacade;
 import org.acme.simulacao.facade.ListaSimulacaoFacade;
 import org.acme.simulacao.facade.RelatorioSimulacaoFacade;
-
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
@@ -29,6 +33,7 @@ import java.time.format.DateTimeParseException;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
+@Tag(name = "Simulações de Crédito", description = "Endpoints para criar e consultar simulações")
 public class SimulacaoRest {
 
     @Inject
@@ -48,6 +53,11 @@ public class SimulacaoRest {
     RelatorioSimulacaoFacade relatorioSimulacaoFacade;
 
     @POST
+    @Operation(summary = "Cria uma nova simulação", description = "Calcula e armazena uma simulação de crédito com base no valor e prazo desejados.")
+    @APIResponse(responseCode = "200", description = "Simulação calculada com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SimulacaoResponse.class)))
+    @APIResponse(responseCode = "404", description = "Nenhum produto de crédito encontrado para os critérios informados")
+    @APIResponse(responseCode = "400", description = "Dados de entrada inválidos (ex: valor negativo)")
+    @APIResponse(responseCode = "500", description = "Erro interno no servidor")
     @Timed(value = "endpoint.simulacoes.post.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
     public Response criarSimulacao(@Valid SimulacaoRequest request) {
         Response response;
@@ -75,6 +85,9 @@ public class SimulacaoRest {
     }
 
     @GET
+    @Operation(summary = "Lista todas as simulações", description = "Retorna uma lista paginada de todas as simulações de crédito já realizadas.")
+    @APIResponse(responseCode = "200", description = "Lista de simulações recuperada com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = PaginatedSimulacaoResponse.class)))
+    @APIResponse(responseCode = "500", description = "Erro interno no servidor")
     @Timed(value = "endpoint.simulacoes.get.tempo", description = "Mede o tempo de resposta do endpoint de listagem.", percentiles = 0.0)
     public Response listarSimulacoes(
             @QueryParam("pagina") @DefaultValue("1") @Min(1) int pagina,
@@ -97,6 +110,10 @@ public class SimulacaoRest {
 
     @GET
     @Path("/diarias")
+    @Operation(summary = "Relatório de simulações diárias", description = "Retorna dados agregados de todas as simulações realizadas em uma data específica.")
+    @APIResponse(responseCode = "200", description = "Relatório gerado com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SimulacaoDiariaResponse.class)))
+    @APIResponse(responseCode = "400", description = "Formato de data inválido. Use AAAA-MM-DD.")
+    @APIResponse(responseCode = "500", description = "Erro interno no servidor")
     @Timed(value = "endpoint.simulacoes.diarias.get.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.", percentiles = 0.0)
     public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
         Response response;
