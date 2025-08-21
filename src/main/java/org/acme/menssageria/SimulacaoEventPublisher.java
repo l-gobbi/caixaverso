@@ -1,4 +1,4 @@
-package org.acme.menssageria.facade;
+package org.acme.menssageria;
 
 import com.azure.messaging.eventhubs.EventData;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
@@ -12,7 +12,7 @@ import java.util.Collections;
 
 @Slf4j
 @ApplicationScoped
-public class EnviarMensagemEventHubFacade {
+public class SimulacaoEventPublisher {
 
     private EventHubProducerClient eventHubProducerClient;
 
@@ -29,7 +29,7 @@ public class EnviarMensagemEventHubFacade {
                 .buildProducerClient();
     }
 
-    public void executar(String json) {
+    public void publicar(String json) {
         EventData eventData = new EventData(json);
         eventHubProducerClient.send(Collections.singletonList(eventData));
     }

@@ -10,16 +10,12 @@ import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.acme.dto.*;
 import org.acme.facade.*;
-import org.acme.menssageria.facade.EnviarMensagemEventHubFacade;
-import org.acme.model.produto.Produto;
-import org.acme.model.simulacao.Simulacao;
 
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 @Slf4j
 @Path("/")
@@ -36,19 +32,10 @@ public class SimulacaoRest {
     DataSource dataSource;
 
     @Inject
-    CalculaSimulacaoFacade calculaSimulacaoFacade;
-
-    @Inject
-    BuscaProdutoFacade buscaProdutoFacade;
-
-    @Inject
-    SalvarSimulacaoFacade salvarSimulacaoFacade;
+    FazerSimulacaoFacade fazerSimulacaoFacade;
 
     @Inject
     ListaSimulacaoFacade listaSimulacaoFacade;
-
-    @Inject
-    EnviarMensagemEventHubFacade enviarMensagemEventHubFacade;
 
     @Inject
     RelatorioSimulacaoFacade relatorioSimulacaoFacade;
@@ -60,20 +47,12 @@ public class SimulacaoRest {
         Response response;
 
         try {
-            log.info("Request: {}", request);
-            Produto produto = buscaProdutoFacade.buscarProduto(request);
-            List<ResultadoSimulacao> resultados = calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros());
-            Simulacao simulacaoSalva = salvarSimulacaoFacade.executar(request, produto, resultados);
+            log.info("Request recebido para fazer simulação: {}", request);
 
-            SimulacaoResponse simulacaoResponse = new SimulacaoResponse();
-            simulacaoResponse.setIdSimulacao(simulacaoSalva.getId());
-            simulacaoResponse.setCodigoProduto(produto.getCoProduto());
-            simulacaoResponse.setDescricaoProduto(produto.getNoProduto());
-            simulacaoResponse.setTaxaJuros(produto.getPcTaxaJuros());
-            simulacaoResponse.setResultadoSimulacao(calculaSimulacaoFacade.calcular(request, produto.getPcTaxaJuros()));
-            log.info("Response: {}", simulacaoResponse);
+            SimulacaoResponse simulacaoResponse = fazerSimulacaoFacade.executar(request);
+
+            log.info("Simulação processada com sucesso: {}", simulacaoResponse);
             response = Response.ok(simulacaoResponse).build();
-            enviarMensagemEventHubFacade.executar(response.toString());
         } catch (NotFoundException e) {
             log.error("Tentativa de simulação para produto inexistente: {}", e.getMessage());
             response = Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -117,7 +96,12 @@ public class SimulacaoRest {
     public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
         Response response;
         try {
-            LocalDate data = LocalDate.parse(dataStr);
+            LocalDate data;
+            if (dataStr == null || dataStr.trim().isEmpty()) {
+                data = LocalDate.now();
+            } else {
+                data = LocalDate.parse(dataStr);
+            }
             SimulacaoDiariaResponse simulacaoDiariaResponse = relatorioSimulacaoFacade.executar(data);
             response = Response.ok(simulacaoDiariaResponse).build();
         } catch (DateTimeParseException e) {
