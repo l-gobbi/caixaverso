@@ -1,5 +1,6 @@
 package org.acme.simulacao.facade;
 
+import io.quarkus.cache.CacheInvalidateAll;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -44,6 +45,7 @@ public class FazerSimulacaoFacade {
     }
 
     @Transactional
+    @CacheInvalidateAll(cacheName = "relatorios-diarios")
     public Simulacao salvarEPublicar(SimulacaoRequest request, Produto produto, List<ResultadoSimulacao> resultados) {
 
         Simulacao simulacaoSalva = salvarSimulacao(request, produto, resultados);

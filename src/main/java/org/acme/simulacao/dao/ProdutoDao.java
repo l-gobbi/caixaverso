@@ -43,6 +43,7 @@ public class ProdutoDao {
                 .map(result -> (Produto) result);
     }
 
+    @CacheResult(cacheName = "produtos-por-taxas")
     public Map<BigDecimal, Produto> buscaProdutosPelasTaxas(List<BigDecimal> taxas) {
         if (taxas == null || taxas.isEmpty()) {
             return Collections.emptyMap();
