@@ -12,6 +12,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   # Serviço da sua Aplicação Quarkus
   app:
@@ -31,6 +33,44 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: sua_senha
       # Garante que o Hibernate crie o schema no banco
       QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
+    networks:
+      - app-network
+
+  # Serviço do Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: on-failure
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+  # Serviço do Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+  grafana_data:
+
+networks:
+  app-network:
+    driver: bridge
