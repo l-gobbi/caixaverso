@@ -43,19 +43,20 @@ public class ProdutoDao {
                 .map(result -> (Produto) result);
     }
 
-    @CacheResult(cacheName = "produtos-por-taxas")
-    public Map<BigDecimal, Produto> buscaProdutosPelasTaxas(List<BigDecimal> taxas) {
-        if (taxas == null || taxas.isEmpty()) {
+    @CacheResult(cacheName = "produtos-por-codigos")
+    public Map<Integer, Produto> buscaProdutosPelosCodigos(List<Integer> codigos) {
+        if (codigos == null || codigos.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        String sql = "SELECT * FROM PRODUTO p WHERE p.PC_TAXA_JUROS IN (:taxas)";
+        String sql = "SELECT * FROM PRODUTO p WHERE p.CO_PRODUTO IN (:codigos)";
         Query query = em.createNativeQuery(sql, Produto.class);
-        query.setParameter("taxas", taxas);
+        query.setParameter("codigos", codigos);
 
         List<Produto> produtos = query.getResultList();
 
         return produtos.stream()
-                .collect(Collectors.toMap(Produto::getPcTaxaJuros, produto -> produto));
+                .collect(Collectors.toMap(Produto::getCoProduto, produto -> produto));
     }
 }
+

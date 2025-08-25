@@ -36,14 +36,15 @@ public class SimulacaoDao {
 
     public List<SimulacaoAgregada> getSimulacoesAgregadasPorDia(LocalDate data) {
         String sql = "SELECT " +
-                "s.taxajuros, " +
-                "AVG(((s.valortotal - s.valordesejado) / s.valordesejado) / (s.prazo / 12.0)), " +
-                "AVG(s.valortotal / s.prazo), " +
-                "SUM(s.valordesejado), " +
-                "SUM(s.valortotal) " +
+                "s.co_produto, " +
+                "s.taxa_juros, " +
+                "AVG(((s.valor_total - s.valor_desejado) / s.valor_desejado) / (s.prazo / 12.0)), " +
+                "AVG(s.valor_total / s.prazo), " +
+                "SUM(s.valor_desejado), " +
+                "SUM(s.valor_total) " +
                 "FROM simulacao s " +
-                "WHERE CAST(s.datasimulacao AS DATE) = :data " +
-                "GROUP BY s.taxajuros";
+                "WHERE CAST(s.data_simulacao AS DATE) = :data " +
+                "GROUP BY s.co_produto, s.taxa_juros";
 
         Query query = em.createNativeQuery(sql);
         query.setParameter("data", data);
@@ -53,11 +54,12 @@ public class SimulacaoDao {
 
         for (Object[] result : results) {
             SimulacaoAgregada agregado = new SimulacaoAgregada(
-                    (BigDecimal) result[0],
+                    (Integer) result[0],
                     (BigDecimal) result[1],
                     (BigDecimal) result[2],
                     (BigDecimal) result[3],
-                    (BigDecimal) result[4]
+                    (BigDecimal) result[4],
+                    (BigDecimal) result[5]
             );
             agregados.add(agregado);
         }

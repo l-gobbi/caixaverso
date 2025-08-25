@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimulacaoAgregada {
+    private int coProduto;
     private BigDecimal taxaJuros;
     private BigDecimal taxaMediaJuroCalculada;
     private BigDecimal valorMedioPrestacao;

@@ -36,14 +36,15 @@ public class RelatorioSimulacaoFacade {
             return new SimulacaoDiariaResponse(data.toString(), new ArrayList<>());
         }
 
-        List<BigDecimal> taxasDeJuros = agregados.stream()
-                .map(SimulacaoAgregada::getTaxaJuros)
+        List<Integer> codigosDeProdutos = agregados.stream()
+                .map(SimulacaoAgregada::getCoProduto)
+                .distinct()
                 .toList();
 
-        Map<BigDecimal, Produto> mapaDeProdutos = produtoDao.buscaProdutosPelasTaxas(taxasDeJuros);
+        Map<Integer, Produto> mapaDeProdutos = produtoDao.buscaProdutosPelosCodigos(codigosDeProdutos);
 
         List<SimulacaoProdutoDiario> simulacoesDiarias = agregados.stream().map(agregado -> {
-            Produto produto = mapaDeProdutos.getOrDefault(agregado.getTaxaJuros(), new Produto());
+            Produto produto = mapaDeProdutos.getOrDefault(agregado.getCoProduto(), new Produto());
 
             return new SimulacaoProdutoDiario(
                     produto.getCoProduto(),

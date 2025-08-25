@@ -64,6 +64,7 @@ public class FazerSimulacaoFacade {
 
     private Simulacao salvarSimulacao(SimulacaoRequest request, Produto produto, List<ResultadoSimulacao> resultados) {
         Simulacao simulacao = new Simulacao();
+        simulacao.setCoProduto(produto.getCoProduto());
         simulacao.setValorDesejado(request.getValorDesejado());
         simulacao.setPrazo(request.getPrazo());
         simulacao.setDataSimulacao(LocalDateTime.now());
