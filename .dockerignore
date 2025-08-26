@@ -1,5 +1,11 @@
-*
-!target/*-runner
-!target/*-runner.jar
-!target/lib/*
-!target/quarkus-app/*
+# Ignora a pasta de build local do Maven
+target/
+
+# Ignora arquivos e pastas do Git
+.git/
+.gitignore
+
+# Ignora arquivos de configuração de IDEs
+.idea/
+.vscode/
+*.iml
