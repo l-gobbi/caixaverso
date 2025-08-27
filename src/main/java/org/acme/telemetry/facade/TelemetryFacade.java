@@ -1,70 +1,81 @@
 package org.acme.telemetry.facade;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.distribution.ValueAtPercentile;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
+import org.acme.model.telemetry.Metricas;
+import org.acme.telemetry.dao.TelemetryDao;
 import org.acme.telemetry.dto.EndpointStats;
 import org.acme.telemetry.dto.TelemetryResponse;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @ApplicationScoped
 public class TelemetryFacade {
 
     @Inject
-    MeterRegistry registry;
+    TelemetryDao telemetryDao;
 
-    public TelemetryResponse getTelemetryData() {
-        List<EndpointStats> statsList = new ArrayList<>();
 
-        statsList.add(createStatsForEndpoint("simulacoes.post"));
-        statsList.add(createStatsForEndpoint("simulacoes.get"));
-        statsList.add(createStatsForEndpoint("simulacoes.diarias.get"));
+    public TelemetryResponse getTelemetryData(LocalDate data) {
+        List<Metricas> metricasDoDia = telemetryDao.buscarPorData(data);
 
-        return new TelemetryResponse(LocalDate.now().toString(), statsList);
+
+        List<EndpointStats> statsList = metricasDoDia.stream()
+                .map(this::converterMetricaParaStats)
+                .collect(Collectors.toList());
+
+        return new TelemetryResponse(data.toString(), statsList);
     }
 
-    private EndpointStats createStatsForEndpoint(String apiName) {
+    @Transactional
+    public void registrarRequisicao(String nomeEndpoint, double duracaoMs, int statusCode) {
+        LocalDate hoje = LocalDate.now();
+        boolean isSuccess = statusCode >= 200 && statusCode < 400;
+        BigDecimal duracaoDecimal = BigDecimal.valueOf(duracaoMs);
 
-        Timer timer = registry.find("endpoint." + apiName + ".tempo").timer();
+        Optional<Metricas> metricaOpt = telemetryDao.buscarPorEndpointEData(nomeEndpoint, hoje);
 
-        Counter successRequests = registry.find("endpoint." + apiName + ".requisicoes").tag("outcome", "SUCCESS").counter();
-
-        Counter errorRequests = registry.find("endpoint." + apiName + ".requisicoes").tag("outcome", "ERROR").counter();
-
-        long successCount = (successRequests != null) ? (long) successRequests.count() : 0;
-        long errorCount = (errorRequests != null) ? (long) errorRequests.count() : 0;
-        long totalCount = successCount + errorCount;
-
-        double successPercentage = (totalCount > 0) ? ((double) successCount / totalCount) : 0.0;
-
-        double avg = 0;
-        double min = 0;
-        double max = 0;
-
-        if (timer != null) {
-            avg = timer.mean(TimeUnit.MILLISECONDS);
-            max = timer.max(TimeUnit.MILLISECONDS);
-
-            ValueAtPercentile[] percentiles = timer.takeSnapshot().percentileValues();
-            if (percentiles.length > 0 && percentiles[0].percentile() == 0.0) {
-                min = percentiles[0].value(TimeUnit.MILLISECONDS);
-            }
+        Metricas metrica;
+        if (metricaOpt.isPresent()) {
+            metrica = metricaOpt.get();
+            metrica.setTotalRequisicoes(metrica.getTotalRequisicoes() + 1);
+            metrica.setRequisicoesSuccesso(metrica.getRequisicoesSuccesso() + (isSuccess ? 1 : 0));
+            metrica.setRequisicoesErro(metrica.getRequisicoesErro() + (isSuccess ? 0 : 1));
+            metrica.setDuracaoTotalMs(metrica.getDuracaoTotalMs().add(duracaoDecimal));
+            metrica.setDuracaoMinimaMs(metrica.getDuracaoMinimaMs().min(duracaoDecimal));
+            metrica.setDuracaoMaximaMs(metrica.getDuracaoMaximaMs().max(duracaoDecimal));
+        } else {
+            metrica = Metricas.builder()
+                    .nomeEndpoint(nomeEndpoint)
+                    .dataReferencia(hoje)
+                    .totalRequisicoes(1L)
+                    .requisicoesSuccesso(isSuccess ? 1L : 0L)
+                    .requisicoesErro(isSuccess ? 0L : 1L)
+                    .duracaoTotalMs(duracaoDecimal)
+                    .duracaoMinimaMs(duracaoDecimal)
+                    .duracaoMaximaMs(duracaoDecimal)
+                    .build();
         }
+        telemetryDao.salvar(metrica);
+    }
+
+    private EndpointStats converterMetricaParaStats(Metricas metrica) {
+        double percentualSucesso = metrica.calcularPercentualSucesso().doubleValue() / 100.0;
 
         return new EndpointStats(
-                apiName,
-                totalCount,
-                avg,
-                min,
-                max,
-                successPercentage
+                metrica.getNomeEndpoint(),
+                metrica.getTotalRequisicoes(),
+                metrica.calcularTempoMedio().doubleValue(),
+                metrica.getDuracaoMinimaMs().doubleValue(),
+                metrica.getDuracaoMaximaMs().doubleValue(),
+                percentualSucesso
         );
     }
+
 }

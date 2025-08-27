@@ -19,6 +19,7 @@ import org.acme.simulacao.dto.SimulacaoResponse;
 import org.acme.simulacao.facade.FazerSimulacaoFacade;
 import org.acme.simulacao.facade.ListaSimulacaoFacade;
 import org.acme.simulacao.facade.RelatorioSimulacaoFacade;
+import org.acme.telemetry.facade.TelemetryFacade;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
@@ -26,8 +27,10 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import javax.sql.DataSource;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.time.Instant;
 
 @Slf4j
 @Path("/api/v1/simulacoes")
@@ -36,9 +39,6 @@ import java.time.format.DateTimeParseException;
 @ApplicationScoped
 @Tag(name = "Simulações de Crédito", description = "Endpoints para criar e consultar simulações")
 public class SimulacaoRest {
-
-    @Inject
-    MeterRegistry registry;
 
     @Inject
     @io.quarkus.agroal.DataSource("consulta")
@@ -53,6 +53,9 @@ public class SimulacaoRest {
     @Inject
     RelatorioSimulacaoFacade relatorioSimulacaoFacade;
 
+    @Inject
+    TelemetryFacade telemetryFacade;
+
     @POST
     @Operation(summary = "Cria uma nova simulação", description = "Calcula e armazena uma simulação de crédito com base no valor e prazo desejados.")
     @APIResponse(responseCode = "201", description = "Simulação criada com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SimulacaoResponse.class)))
@@ -62,6 +65,7 @@ public class SimulacaoRest {
     @Timed(value = "endpoint.simulacoes.post.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
     @RateLimited(bucket = "simulacoes")
     public Response criarSimulacao(@Valid SimulacaoRequest request) {
+        Instant start = Instant.now();
         Response response;
 
         try {
@@ -79,10 +83,9 @@ public class SimulacaoRest {
             log.error("Erro inesperado ao fazer simulação: {}", e.getMessage(), e);
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Ocorreu um erro inesperado ao processar a simulação.").build();
-
         }
-        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.simulacoes.post.requisicoes", "outcome", outcome).increment();
+        double duration = Duration.between(start, Instant.now()).toMillis();
+        telemetryFacade.registrarRequisicao("simulacoes.post", duration, response.getStatus());
         return response;
     }
 
@@ -95,6 +98,7 @@ public class SimulacaoRest {
     public Response listarSimulacoes(
             @QueryParam("pagina") @DefaultValue("1") @Min(1) int pagina,
             @QueryParam("qtdRegistrosPagina") @DefaultValue("10") @Min(1) @Max(100) int qtdRegistrosPagina) {
+        Instant start = Instant.now();
         Response response;
         try {
             PaginatedSimulacaoResponse paginatedResponse = listaSimulacaoFacade.executar(pagina, qtdRegistrosPagina);
@@ -105,8 +109,8 @@ public class SimulacaoRest {
                     .entity("Erro ao listar simulações: " + e.getMessage())
                     .build();
         }
-        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.simulacoes.get.requisicoes", "outcome", outcome).increment();
+        double duration = Duration.between(start, Instant.now()).toMillis();
+        telemetryFacade.registrarRequisicao("simulacoes.get", duration, response.getStatus());
 
         return response;
     }
@@ -120,6 +124,7 @@ public class SimulacaoRest {
     @Timed(value = "endpoint.simulacoes.diarias.get.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.", percentiles = 0.0)
     @RateLimited(bucket = "simulacoes")
     public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
+        Instant start = Instant.now();
         Response response;
         try {
             LocalDate data;
@@ -140,8 +145,9 @@ public class SimulacaoRest {
                     .entity("Erro ao buscar relatório de simulações diárias: " + e.getMessage())
                     .build();
         }
-        String outcome = response.getStatus() >= 200 && response.getStatus() < 300 ? "SUCCESS" : "ERROR";
-        registry.counter("endpoint.simulacoes.diarias.get.requisicoes", "outcome", outcome).increment();
+        double duration = Duration.between(start, Instant.now()).toMillis();
+        telemetryFacade.registrarRequisicao("simulacoes.diarias.get", duration, response.getStatus());
+
         return response;
     }
 }
