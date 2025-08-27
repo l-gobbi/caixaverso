@@ -54,7 +54,7 @@ public class SimulacaoRest {
 
     @POST
     @Operation(summary = "Cria uma nova simulação", description = "Calcula e armazena uma simulação de crédito com base no valor e prazo desejados.")
-    @APIResponse(responseCode = "200", description = "Simulação calculada com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SimulacaoResponse.class)))
+    @APIResponse(responseCode = "201", description = "Simulação criada com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = SimulacaoResponse.class)))
     @APIResponse(responseCode = "404", description = "Nenhum produto de crédito encontrado para os critérios informados")
     @APIResponse(responseCode = "400", description = "Dados de entrada inválidos (ex: valor negativo)")
     @APIResponse(responseCode = "500", description = "Erro interno no servidor")
@@ -68,7 +68,7 @@ public class SimulacaoRest {
             SimulacaoResponse simulacaoResponse = fazerSimulacaoFacade.executar(request);
 
             log.info("Simulação processada com sucesso: {}", simulacaoResponse);
-            response = Response.ok(simulacaoResponse).build();
+            response = Response.status(Response.Status.CREATED).entity(simulacaoResponse).build();
         } catch (NotFoundException e) {
             log.error("Tentativa de simulação para produto inexistente: {}", e.getMessage());
             response = Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();

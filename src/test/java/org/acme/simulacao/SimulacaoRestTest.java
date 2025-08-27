@@ -26,7 +26,7 @@ public class SimulacaoRestTest {
                 .body(request)
                 .when().post("/api/v1/simulacoes")
                 .then()
-                .statusCode(200)
+                .statusCode(201)
                 .body("$", hasKey("idSimulacao"))
                 .body("codigoProduto", is(1))
                 .body("descricaoProduto", is("Crédito Pessoal"));
@@ -73,7 +73,7 @@ public class SimulacaoRestTest {
                 .body(request)
                 .when().post("/api/v1/simulacoes")
                 .then()
-                .statusCode(200);
+                .statusCode(201);
 
         given()
                 .when().get("/api/v1/simulacoes")
