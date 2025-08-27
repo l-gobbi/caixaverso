@@ -4,6 +4,13 @@ Este projeto é uma API REST para simulação de crédito, desenvolvida com Quar
 A aplicação permite aos usuários simular ofertas de crédito com base no valor desejado e no prazo, 
 calculando os resultados pelos sistemas de amortização SAC e Price.
 
+## 📝 Decisões de Design
+
+- Persistência de Dados: Como não foi definido nos requisitos do desafio, para o armazenamento das simulações, optou-se por salvar os dados calculados com base no sistema de amortização Price.
+
+
+- Cache: Foi implementado um cache para as consultas de produtos e relatórios diários para melhorar a performance. Um scheduler foi configurado para limpar o cache diariamente à meia-noite (0 0 0 * * ?), garantindo que os dados não fiquem desatualizados. Um endpoint de limpeza manual também foi disponibilizado para invalidação imediata.
+
 ## Pré-requisitos para executar o projeto
 [WSL (Windows Subsystem for Linux)](https://learn.microsoft.com/pt-br/windows/wsl/install)
 
@@ -52,26 +59,18 @@ Para rodar o projeto, execute o comando:
 
 
 ## Endpoints
-POST http://localhost:8080/api/v1/simulacoes
+- POST http://localhost:8080/api/v1/simulacoes Cria uma nova simulação de crédito.
 
-GET http://localhost:8080/api/v1/simulacoes
+- GET http://localhost:8080/api/v1/simulacoes Lista as simulações de forma paginada.
 
-GET http://localhost:8080/api/v1/simulacoes/diarias
+- GET http://localhost:8080/api/v1/simulacoes/diarias Retorna um relatório diário de simulações.
 
-GET http://localhost:8080/api/v1/telemetria
+- GET http://localhost:8080/api/v1/telemetria Exibe as métricas de telemetria da aplicação.
 
-POST http://localhost:8080/api/v1/cache/clear
+- POST http://localhost:8080/api/v1/cache/clear Limpa o cache da manualmente.
 
-http://localhost:8080/q/health/
+- Health Check: http://localhost:8080/q/health/
 
-http://localhost:8080/q/swagger-ui/
+- Swagger UI (Documentação da API): http://localhost:8080/q/swagger-ui/
 
-http://localhost:3000/dashboards
-
-
-## 📝 Decisões de Design
-
-- Persistência de Dados: Como não foi definido nos requisitos do desafio, para o armazenamento das simulações, optou-se por salvar os dados calculados com base no sistema de amortização Price.
-
-
-- Cache: Foi implementado um cache para as consultas de produtos e relatórios diários para melhorar a performance. Um scheduler foi configurado para limpar o cache diariamente à meia-noite (0 0 0 * * ?), garantindo que os dados não fiquem desatualizados. Um endpoint de limpeza manual também foi disponibilizado para invalidação imediata.
+- Grafana Dashboards: http://localhost:3000/dashboards
