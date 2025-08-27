@@ -1,10 +1,16 @@
 # Simulação de crédito
 
-Para rodar o projeto é necessário wsl e docker instalado e rodando.
+Este projeto é uma API REST para simulação de crédito, desenvolvida com Quarkus. 
+A aplicação permite aos usuários simular ofertas de crédito com base no valor desejado e no prazo, 
+calculando os resultados pelos sistemas de amortização SAC e Price.
+
+## Pré-requisitos para executar o projeto
+WSL (Windows Subsystem for Linux)
+
+Docker e Docker Compose
 
 Em seguida, execute o comando:
-    - "docker compose up --build"
-
+- "docker compose up --build"
 
 ## Tecnologias usadas
 
@@ -14,6 +20,9 @@ Para evitar o retorno de dados desatualizados também foi adicionado um schedule
 que limpa o cache caso queira os dados atualizados imediatamente.
 
 -Health check para verificar se a conexão com o banco de dados está ativa.
+
+-Outra tecnologia utilizada foi o scraping de métricas com o prometheus e a utilização 
+do grafana para demonstrá-las em gráfico.
 
 
 ## Endpoints
