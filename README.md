@@ -31,6 +31,8 @@ http://localhost:8080/q/health/
 
 http://localhost:8080/q/swagger-ui/
 
+http://localhost:3000/dashboards
+
 
 ## Decisões negociais
 
