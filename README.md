@@ -40,8 +40,8 @@ Para rodar o projeto, execute o comando:
 - Telemetria: Métricas de performance dos endpoints.
 
 - Cache: Mecanismo de cache para otimizar a busca de produtos e relatórios diários. 
- - Limpeza Agendada: Um scheduler limpa o cache diariamente à meia-noite para evitar dados desatualizados.
- - Limpeza Manual: Um endpoint permite a limpeza imediata do cache.
+    - Limpeza Agendada: Um scheduler limpa o cache diariamente à meia-noite para evitar dados desatualizados.
+    - Limpeza Manual: Um endpoint permite a limpeza imediata do cache.
 
 - Health Check: Verificação da saúde das conexões com os bancos de dados.
 
