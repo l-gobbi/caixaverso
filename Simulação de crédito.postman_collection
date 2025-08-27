@@ -1,0 +1,180 @@
+{
+	"info": {
+		"_postman_id": "1e778612-a5d8-4dec-8f07-42c7f2a5d01f",
+		"name": "Simulação de crédito",
+		"description": "Collection para testar a API de Simulação de Crédito desenvolvida em Quarkus.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47696928",
+		"_collection_link": "https://lucasmegobbi-5519280.postman.co/workspace/Lucas-Gobbi's-Workspace~faaf421b-0c5a-4e16-83be-8754f99157e4/collection/47696928-1e778612-a5d8-4dec-8f07-42c7f2a5d01f?action=share&source=collection_link&creator=47696928"
+	},
+	"item": [
+		{
+			"name": "fazerSimulacao",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"valorDesejado\": 15000.00,\r\n\t\"prazo\": 26\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/simulacoes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"simulacoes"
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Simulacoes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/simulacoes?qtdRegistrosPagina=20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"simulacoes"
+					],
+					"query": [
+						{
+							"key": "qtdRegistrosPagina",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "relatorio/simulacoes-diarias",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/simulacoes/diarias",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"simulacoes",
+						"diarias"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "2025-08-21",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Telemetria",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/telemetria",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"telemetria"
+					],
+					"query": [
+						{
+							"key": "data",
+							"value": "2025-08-27",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Limpar cache",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/cache/clear",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"cache",
+						"clear"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
