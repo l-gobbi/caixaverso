@@ -2,6 +2,7 @@ package org.acme.simulacao;
 
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.quarkiverse.bucket4j.runtime.RateLimited;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -59,6 +60,7 @@ public class SimulacaoRest {
     @APIResponse(responseCode = "400", description = "Dados de entrada inválidos (ex: valor negativo)")
     @APIResponse(responseCode = "500", description = "Erro interno no servidor")
     @Timed(value = "endpoint.simulacoes.post.tempo", description = "Mede o tempo de resposta do endpoint de simulação.", percentiles = 0.0)
+    @RateLimited(bucket = "simulacoes")
     public Response criarSimulacao(@Valid SimulacaoRequest request) {
         Response response;
 
@@ -89,6 +91,7 @@ public class SimulacaoRest {
     @APIResponse(responseCode = "200", description = "Lista de simulações recuperada com sucesso", content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = PaginatedSimulacaoResponse.class)))
     @APIResponse(responseCode = "500", description = "Erro interno no servidor")
     @Timed(value = "endpoint.simulacoes.get.tempo", description = "Mede o tempo de resposta do endpoint de listagem.", percentiles = 0.0)
+    @RateLimited(bucket = "simulacoes")
     public Response listarSimulacoes(
             @QueryParam("pagina") @DefaultValue("1") @Min(1) int pagina,
             @QueryParam("qtdRegistrosPagina") @DefaultValue("10") @Min(1) @Max(100) int qtdRegistrosPagina) {
@@ -115,6 +118,7 @@ public class SimulacaoRest {
     @APIResponse(responseCode = "400", description = "Formato de data inválido. Use AAAA-MM-DD.")
     @APIResponse(responseCode = "500", description = "Erro interno no servidor")
     @Timed(value = "endpoint.simulacoes.diarias.get.tempo", description = "Mede o tempo de resposta do endpoint de relatório de simulações diárias.", percentiles = 0.0)
+    @RateLimited(bucket = "simulacoes")
     public Response getSimulacoesDiarias(@QueryParam("data") String dataStr) {
         Response response;
         try {
