@@ -10,7 +10,6 @@ import org.acme.simulacao.dto.SimulacaoDiariaResponse;
 import org.acme.simulacao.dto.SimulacaoProdutoDiario;
 import org.acme.model.produto.Produto;
 
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;

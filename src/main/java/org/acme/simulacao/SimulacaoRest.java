@@ -69,11 +69,7 @@ public class SimulacaoRest {
         Response response;
 
         try {
-            log.info("Request recebido para fazer simulação: {}", request);
-
             SimulacaoResponse simulacaoResponse = fazerSimulacaoFacade.executar(request);
-
-            log.info("Simulação processada com sucesso: {}", simulacaoResponse);
             response = Response.status(Response.Status.CREATED).entity(simulacaoResponse).build();
         } catch (NotFoundException e) {
             log.error("Tentativa de simulação para produto inexistente: {}", e.getMessage());
