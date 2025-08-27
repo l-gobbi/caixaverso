@@ -5,12 +5,29 @@ A aplicação permite aos usuários simular ofertas de crédito com base no valo
 calculando os resultados pelos sistemas de amortização SAC e Price.
 
 ## Pré-requisitos para executar o projeto
-WSL (Windows Subsystem for Linux)
+[WSL (Windows Subsystem for Linux)](https://learn.microsoft.com/pt-br/windows/wsl/install)
 
-Docker e Docker Compose
+[Docker](https://docs.docker.com/get-started/get-docker/) e [Docker Compose](https://docs.docker.com/compose/install/)
 
-Em seguida, execute o comando:
+Para rodar o projeto, execute o comando:
 - "docker compose up --build"
+
+## Tecnologias Utilizadas
+- Framework: Quarkus
+
+- Linguagem: Java 17
+
+- Banco de Dados: PostgreSQL (para simulações) e Microsoft SQL Server (para consulta de produtos)
+
+- Mensageria: Azure Event Hubs
+
+- Monitoramento: Prometheus e Grafana
+
+- Contêineres: Docker e Docker Compose
+
+- Cache: Quarkus Cache
+
+- Rate Limiting: Bucket4j
 
 ## Funcionalidades principais
 
@@ -22,15 +39,16 @@ Em seguida, execute o comando:
 
 - Telemetria: Métricas de performance dos endpoints.
 
-- Mecanismo de cache ao buscar produtos e relatorios diários. 
-Para evitar o retorno de dados desatualizados também foi adicionado um scheduler que limpa o cache
-(o horário pode ser ajustado, nesse caso foi escolhido todo dia à meia-noite) e um endpoint
-que limpa o cache caso queira os dados atualizados imediatamente.
+- Cache: Mecanismo de cache para otimizar a busca de produtos e relatórios diários. 
+ - Limpeza Agendada: Um scheduler limpa o cache diariamente à meia-noite para evitar dados desatualizados.
+ - Limpeza Manual: Um endpoint permite a limpeza imediata do cache.
 
 - Health Check: Verificação da saúde das conexões com os bancos de dados.
 
-- Scraping de métricas com o prometheus e a utilização 
-do grafana para demonstrá-las em gráfico.
+- Rate Limiting: Proteção contra um número excessivo de requisições.
+
+- Métricas: Coleta de métricas com Prometheus e visualização em dashboards do Grafana.
+
 
 
 ## Endpoints
