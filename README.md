@@ -73,4 +73,4 @@ Para rodar o projeto, execute o comando:
 
 - Swagger UI (Documentação da API): http://localhost:8080/q/swagger-ui/
 
-- Grafana Dashboards: http://localhost:3000/dashboards
+- Grafana Dashboards: http://localhost:3000/dashboards (para facilitar o teste do avaliador foi mantido o login "admin" e a senha "admin" para o grafana)
