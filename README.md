@@ -52,9 +52,14 @@ Para rodar o projeto, execute o comando:
 
 - Health Check: Verificação da saúde das conexões com os bancos de dados.
 
-- Rate Limiting: Proteção contra um número excessivo de requisições.
+- Rate Limiting: Proteção contra um número excessivo de requisições.¹
 
 - Métricas: Coleta de métricas com Prometheus e visualização em dashboards do Grafana.
+
+¹ Para ajustar o número de requisições permitidas por segundo por um
+  usuário altere a variável "quarkus.rate-limiter.buckets.simulacoes.limits[0].permitted-uses"
+  no arquivo application.properties. O valor definido por padrão foi 150, mas o máximo que
+  a aplicação suporta pode variar dependendo da capacidade dos dispositivos utilizados.
 
 
 
