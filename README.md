@@ -50,3 +50,18 @@ Para iniciar a aplicação em modo de desenvolvimento, execute o seguinte comand
 
 ```bash
 ./mvnw quarkus:dev
+```
+
+A aplicação estará disponível em http://localhost:8080. A documentação da API (Swagger UI) pode ser acessada em http://localhost:8080/q/swagger-ui.
+
+Testes
+Para rodar os testes unitários e de integração, utilize o comando:
+
+```bash
+./mvnw test
+```
+
+### Cobertura de Testes
+O projeto atinge uma cobertura de testes de 100% das linhas, como demonstrado na imagem abaixo.
+
+![Testes](img.png)
