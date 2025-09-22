@@ -1,2 +1,0 @@
-INSERT INTO Produto(id, nome, taxaJurosAnual, prazoMaximoMeses) VALUES (1, 'Empréstimo Pessoal', 18.0, 24);
-INSERT INTO Produto(id, nome, taxaJurosAnual, prazoMaximoMeses) VALUES (2, 'Crédito Consignado', 12.0, 48);

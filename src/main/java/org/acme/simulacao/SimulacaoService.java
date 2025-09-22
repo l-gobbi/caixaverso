@@ -1,7 +1,9 @@
 package org.acme.simulacao;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.acme.produto.Produto;
+import org.acme.produto.ProdutoRepository;
 import org.acme.simulacao.dto.MemoriaCalculo;
 import org.acme.simulacao.dto.SimulacaoRequest;
 import org.acme.simulacao.dto.SimulacaoResponse;
@@ -13,8 +15,11 @@ import java.util.Optional;
 @ApplicationScoped
 public class SimulacaoService {
 
+    @Inject
+    ProdutoRepository produtoRepository;
+
     public Optional<SimulacaoResponse> simular(SimulacaoRequest request) {
-        Optional<Produto> produtoOpt = Produto.findByIdOptional(request.idProduto);
+        Optional<Produto> produtoOpt = produtoRepository.findByIdOptional(request.idProduto);
 
         if (produtoOpt.isEmpty()) {
             return Optional.empty(); // Produto não encontrado
