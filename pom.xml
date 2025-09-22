@@ -36,15 +36,11 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-postgresql</artifactId>
+            <artifactId>quarkus-jdbc-h2</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-mssql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-hibernate-orm</artifactId>
+            <artifactId>quarkus-hibernate-orm-panache</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -76,15 +72,6 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-messaging-eventhubs</artifactId>
-            <version>5.14.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-cache</artifactId>
         </dependency>
         <dependency>
@@ -98,16 +85,6 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-openapi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-scheduler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.bucket4j</groupId>
@@ -129,7 +106,6 @@
                             <goal>build</goal>
                             <goal>generate-code</goal>
                             <goal>generate-code-tests</goal>
-                            <goal>native-image-agent</goal>
                         </goals>
                     </execution>
                 </executions>
