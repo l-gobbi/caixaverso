@@ -28,18 +28,14 @@ public class SimulacaoService {
         Produto produto = produtoOpt.get();
 
         if (request.prazoMeses > produto.prazoMaximoMeses) {
-            // Poderíamos lançar uma exceção de negócio aqui
             return Optional.empty();
         }
 
-        // 1. Calcular taxa de juros efetiva mensal
         double taxaAnualDecimal = produto.taxaJurosAnual / 100.0;
         double taxaMensal = Math.pow(1 + taxaAnualDecimal, 1.0 / 12.0) - 1;
 
-        // 2. Calcular Parcela (Sistema Price)
         double pmt = request.valorSolicitado * (taxaMensal * Math.pow(1 + taxaMensal, request.prazoMeses)) / (Math.pow(1 + taxaMensal, request.prazoMeses) - 1);
 
-        // 3. Gerar memória de cálculo
         List<MemoriaCalculo> memoria = new ArrayList<>();
         double saldoDevedor = request.valorSolicitado;
         for (int i = 1; i <= request.prazoMeses; i++) {
@@ -50,7 +46,6 @@ public class SimulacaoService {
             memoria.add(new MemoriaCalculo(i, saldoDevedorInicial, juros, amortizacao, saldoDevedor));
         }
 
-        // 4. Montar a resposta
         SimulacaoResponse response = new SimulacaoResponse();
         response.produto = produto;
         response.valorSolicitado = request.valorSolicitado;
