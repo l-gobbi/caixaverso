@@ -7,11 +7,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class ProdutoRestTest {
@@ -56,6 +60,81 @@ public class ProdutoRestTest {
 
         // Act
         Response response = produtoRest.buscarPorId(99L);
+
+        // Assert
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void testCriarProduto() {
+        // Arrange
+        Produto produto = new Produto();
+        produto.nome = "Teste";
+
+        // Act
+        Response response = produtoRest.criar(produto);
+
+        // Assert
+        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        assertNotNull(response.getEntity());
+        Mockito.verify(produtoRepository, Mockito.times(1)).persist(any(Produto.class));
+    }
+
+    @Test
+    void testAtualizarProdutoSucesso() {
+        // Arrange
+        Produto produtoExistente = new Produto();
+        produtoExistente.id = 1L;
+        produtoExistente.nome = "Original";
+
+        Produto produtoAtualizado = new Produto();
+        produtoAtualizado.nome = "Atualizado";
+
+        Mockito.when(produtoRepository.findByIdOptional(1L)).thenReturn(Optional.of(produtoExistente));
+
+        // Act
+        Response response = produtoRest.atualizar(1L, produtoAtualizado);
+
+        // Assert
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Produto produtoRetornado = (Produto) response.getEntity();
+        assertEquals("Atualizado", produtoRetornado.nome);
+    }
+
+    @Test
+    void testAtualizarProdutoNaoEncontrado() {
+        // Arrange
+        Produto produtoAtualizado = new Produto();
+        produtoAtualizado.nome = "Atualizado";
+        Mockito.when(produtoRepository.findByIdOptional(anyLong())).thenReturn(Optional.empty());
+
+        // Act
+        Response response = produtoRest.atualizar(99L, produtoAtualizado);
+
+        // Assert
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
+
+    @Test
+    void testDeletarProdutoSucesso() {
+        // Arrange
+        Mockito.when(produtoRepository.deleteById(1L)).thenReturn(true);
+
+        // Act
+        Response response = produtoRest.deletar(1L);
+
+        // Assert
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    void testDeletarProdutoNaoEncontrado() {
+        // Arrange
+        Mockito.when(produtoRepository.deleteById(99L)).thenReturn(false);
+
+        // Act
+        Response response = produtoRest.deletar(99L);
 
         // Assert
         assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());

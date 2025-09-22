@@ -19,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SimulacaoServiceTest {
 
     @Mock
-    ProdutoRepository produtoRepository; // Cria um mock do repository
+    ProdutoRepository produtoRepository;
 
     @InjectMocks
-    SimulacaoService simulacaoService; // Cria uma instância do serviço e injeta os mocks
+    SimulacaoService simulacaoService;
 
     @Test
     void testSimularSucesso() {
-        // 1. Arrange
+        // Arrange
         Produto produtoMock = new Produto();
         produtoMock.id = 1L;
         produtoMock.taxaJurosAnual = 18.0;
@@ -39,11 +39,50 @@ public class SimulacaoServiceTest {
         request.valorSolicitado = 10000.0;
         request.prazoMeses = 12;
 
-        // 2. Act
+        // Act
         Optional<SimulacaoResponse> response = simulacaoService.simular(request);
 
-        // 3. Assert
+        // Assert
         assertTrue(response.isPresent());
         assertEquals(1L, response.get().produto.id);
+        assertEquals(910.46, response.get().parcelaMensal, 0.01);
+    }
+
+    @Test
+    void testSimularProdutoNaoEncontrado() {
+        // Arrange
+        Mockito.when(produtoRepository.findByIdOptional(99L)).thenReturn(Optional.empty());
+
+        SimulacaoRequest request = new SimulacaoRequest();
+        request.idProduto = 99L;
+        request.valorSolicitado = 10000.0;
+        request.prazoMeses = 12;
+
+        // Act
+        Optional<SimulacaoResponse> response = simulacaoService.simular(request);
+
+        // Assert
+        assertTrue(response.isEmpty());
+    }
+
+    @Test
+    void testSimularPrazoExcedido() {
+        // Arrange
+        Produto produtoMock = new Produto();
+        produtoMock.id = 1L;
+        produtoMock.prazoMaximoMeses = 24; // Prazo máximo de 24 meses
+
+        Mockito.when(produtoRepository.findByIdOptional(1L)).thenReturn(Optional.of(produtoMock));
+
+        SimulacaoRequest request = new SimulacaoRequest();
+        request.idProduto = 1L;
+        request.valorSolicitado = 10000.0;
+        request.prazoMeses = 30; // Solicita um prazo de 30 meses
+
+        // Act
+        Optional<SimulacaoResponse> response = simulacaoService.simular(request);
+
+        // Assert
+        assertTrue(response.isEmpty());
     }
 }
